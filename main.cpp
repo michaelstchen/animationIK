@@ -15,6 +15,7 @@ using namespace glm;
 #include "shader.h"
 #include "joint.h"
 #include "readfile.h"
+#include "keylistener.h"
 
 //****************************************************
 // Global variables
@@ -33,15 +34,12 @@ std::vector< vec3 > vertices;
 std::vector< vec3 > normals;
 
 std::vector< Joint* > skeleton;
-Joint joint0 = Joint(NULL, 1.5f);
-Joint joint1 = Joint(&joint0, 2.0f);
+Joint joint0 = Joint(NULL, 5.0f);
+Joint joint1 = Joint(&joint0, 5.0f);
+Joint joint2 = Joint(&joint1, 5.0f);
+Joint joint3 = Joint(&joint2, 5.0f);
 
 mat4 MVP;
-
-vec3 camPos = vec3(20, 20, 20);
-vec3 origin = vec3(0, 0, 0);
-vec3 up = vec3(0,0,1);
-
 
 //****************************************************
 // Callback Functions
@@ -65,19 +63,9 @@ void renderScene() {
     mat4 Projection = glm::perspective(degToRad(45.0f), 4.0f/3.0f, 0.1f, 100.0f);
     //mat4 Projection = glm::ortho(-7.0f,7.0f,-4.0f,4.0f,0.0f,100.0f);
     // Camera matrix
-    mat4 View = glm::lookAt(camPos, origin, up);
-    // Model matrix : an identity matrix (model will be at the origin)
-    mat4 Model = joint0.Model;
-    // Our ModelViewProjection : multiplication of our 3 matrices
-    MVP = Projection * View * Model;
+    mat4 View = getViewMat();
 
-    // Send our transformation to the currently bound shader, 
-    // in the "MVP" uniform
-    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-    glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &Model[0][0]);
-    glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
-
-    vec3 lightPos = vec3(5, 5, 5);
+    vec3 lightPos = vec3(5, 5, 10);
     glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
 
     // 1st attribute buffer : vertices
@@ -90,8 +78,21 @@ void renderScene() {
     glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
     
-    // Draw the triangle
-    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    // Draw the joints
+    for (int i = 0; i < skeleton.size(); i++) {
+        // Model matrix : an identity matrix (model will be at the origin)
+        mat4 Model = skeleton[i]->Model;
+        // Our ModelViewProjection : multiplication of our 3 matrices
+        MVP = Projection * View * Model;
+
+        // Send our transformation to the currently bound shader, 
+        // in the "MVP" uniform
+        glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+        glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &Model[0][0]);
+        glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
+
+        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+    }
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
@@ -121,7 +122,7 @@ int main(int argc, char **argv) {
 
     glutInitWindowPosition(0, 0);
     glutInitWindowSize(windowWidth, windowHeight);
-    glutCreateWindow("CS184 Assignement 3: Bezier Surfaces");
+    glutCreateWindow("CS184 Assignment 4: Inverse Kinematics");
 
     // register callbacks
     glutDisplayFunc(renderScene);
@@ -129,8 +130,8 @@ int main(int argc, char **argv) {
     glutIdleFunc(renderScene);
 
     // user input processing
-    //glutKeyboardFunc(normalKeys);
-    //glutSpecialFunc(specialKeys);
+    glutKeyboardFunc(normalKeys);
+    glutSpecialFunc(specialKeys);
 
     // Initialize GLEW
     glewExperimental = GL_TRUE;
@@ -164,7 +165,10 @@ int main(int argc, char **argv) {
     glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
 
     skeleton.push_back(&joint0);
-    //skeleton.push_back(&joint1);
+    skeleton.push_back(&joint1);
+    skeleton.push_back(&joint2);
+    skeleton.push_back(&joint3);
+
 
     // enter GLUT event processing loop
     glutMainLoop();
