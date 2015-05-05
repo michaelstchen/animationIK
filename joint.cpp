@@ -1,5 +1,4 @@
 #include "joint.h"
-#include "readfile.h"
 
 
 Joint::Joint(Joint* p, float length) {
@@ -7,8 +6,10 @@ Joint::Joint(Joint* p, float length) {
     parent = p;
     len = length;
 
-    Model = mat4(1.0f);
-
-    loadOBJ("Inputs/joint.obj", vertices, normals);
+    if (parent == NULL) {
+        Model = mat4(1.0f);
+    } else {
+        Model = glm::translate(parent->Model, vec3(0, 0, parent->len));
+    }
 
 }

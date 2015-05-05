@@ -16,9 +16,6 @@ class Joint {
 
     Joint* parent;
     float len;
-
-    std::vector< vec3 > vertices;
-    std::vector< vec3 > normals;
     
     mat4 Model;
 

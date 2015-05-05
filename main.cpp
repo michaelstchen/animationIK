@@ -14,6 +14,7 @@ using namespace glm;
 
 #include "shader.h"
 #include "joint.h"
+#include "readfile.h"
 
 //****************************************************
 // Global variables
@@ -28,10 +29,12 @@ GLuint VertexArrayID;
 GLuint vertexbuffer;
 GLuint normalbuffer;
 
-//std::vector< vec3 > vertices;
-//std::vector< vec3 > normals;
+std::vector< vec3 > vertices;
+std::vector< vec3 > normals;
 
+std::vector< Joint* > skeleton;
 Joint joint0 = Joint(NULL, 1.5f);
+Joint joint1 = Joint(&joint0, 2.0f);
 
 mat4 MVP;
 
@@ -88,7 +91,7 @@ void renderScene() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
     
     // Draw the triangle
-    glDrawArrays(GL_TRIANGLES, 0, joint0.vertices.size());
+    glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
@@ -150,16 +153,18 @@ int main(int argc, char **argv) {
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
 
-    // Read and load info for vertices
-    //j0 = Joint(NULL, 1.5);
+    loadOBJ("Inputs/joint.obj", vertices, normals);
 
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, joint0.vertices.size() * sizeof(glm::vec3), &joint0.vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
 
     glGenBuffers(1, &normalbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
-    glBufferData(GL_ARRAY_BUFFER, joint0.normals.size() * sizeof(glm::vec3), &joint0.normals[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
+
+    skeleton.push_back(&joint0);
+    //skeleton.push_back(&joint1);
 
     // enter GLUT event processing loop
     glutMainLoop();
