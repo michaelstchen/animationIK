@@ -81,7 +81,7 @@ void renderScene() {
     // Draw the joints
     for (int i = 0; i < skeleton.size(); i++) {
         // Model matrix : an identity matrix (model will be at the origin)
-        mat4 Model = skeleton[i]->Model;
+        mat4 Model = skeleton[i]->modelMat();
         // Our ModelViewProjection : multiplication of our 3 matrices
         MVP = Projection * View * Model;
 

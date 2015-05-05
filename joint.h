@@ -2,8 +2,11 @@
 #define JOINT_H
 
 #include <vector>
+#include <Eigen/Dense>
+using namespace Eigen;
 using namespace std;
 
+#define PI 3.141592f
 #define degToRad(x) x*(3.141592f/180.0f)
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -17,8 +20,12 @@ class Joint {
     Joint* parent;
     float len;
     
-    mat4 Model;
+    Vector4f rot;
+
+    mat4 modelMat();
 
 };
+
+
 
 #endif
