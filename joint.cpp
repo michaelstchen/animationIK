@@ -11,12 +11,14 @@ Joint::Joint(Joint* p, Joint* n, float length) {
     rot << 0.0f, 0.0f, 0.0f, 0.0f;
 }
 
+// glm matrix accesses are m[col][row] while
+// eigen matrix accesses are m[row][col]
 mat4 eigen_to_glm(Matrix4f m) {
     mat4 model = mat4(1.0f);
 
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            model[i][j] = m(i, j);
+            model[i][j] = m(j, i);
         }
     }
 
