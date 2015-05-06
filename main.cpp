@@ -85,15 +85,11 @@ void renderScene() {
     } else {
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     }
-    std::cout << "\n";
-    std::cout << "\n";
+
     // Draw the joints
     for (int i = 0; i < skeleton.size(); i++) {
         // Model matrix
         mat4 Model = skeleton[i]->modelMat();
-        std::cout << "\n";
-        std::cout<<glm::to_string(Model)<<std::endl;
-        std::cout << "\n";
         // Our ModelViewProjection : multiplication of our 3 matrices
         MVP = Projection * View * Model;
 
@@ -105,8 +101,7 @@ void renderScene() {
 
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
     }
-    std::cout << "\n";
-    std::cout << "\n";
+
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
 

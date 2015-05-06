@@ -24,6 +24,7 @@ class Joint {
 
     Matrix4f X();
     Matrix4f R();
+    Matrix3f J();
     mat4 modelMat();
 
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
