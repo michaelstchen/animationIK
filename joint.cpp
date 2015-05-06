@@ -60,8 +60,15 @@ Matrix4f rodriguez(Vector4f & r) {
 }
 
 Matrix4f Joint::X() {
+    Vector4f length_v;
+    length_v << 0.0, 0.0, len, 1.0;
+    Vector4f p_i = R() * length_v;
+
     Matrix4f transform = R();
-    transform(2, 3) = len;
+    transform(0, 3) = p_i(0);
+    transform(1, 3) = p_i(1);
+    transform(2, 3) = p_i(2);
+
     return transform;
 }
 
@@ -69,16 +76,26 @@ Matrix4f Joint::R() {
     return rodriguez(rot);
 }
 
-mat4 Joint::modelMat() {
-    if (prev == NULL) {
-        return eigen_to_glm(X());
+
+mat4 modelMatHelper(Joint & j) {
+    if (j.prev == NULL) {
+        return eigen_to_glm(j.X());
     }
 
-    return prev->modelMat() * eigen_to_glm(X());
-
+    return modelMatHelper(*j.prev) * eigen_to_glm(j.X());
 }
 
 
+mat4 Joint::modelMat() {
+    if (prev == NULL) {
+        return eigen_to_glm(R());
+    }
+
+    mat4 toWorld = modelMatHelper(*prev);
+
+    return toWorld * eigen_to_glm(R());
+
+}
 
 
 // int main(int argc, char **argv) {
