@@ -15,15 +15,18 @@ using namespace glm;
 
 class Joint {
  public:
-    Joint(Joint* p, float length);
+    Joint(Joint* p, Joint* n, float length);
+    Joint* prev; Joint* next;
 
-    Joint* parent;
     float len;
     
     Vector4f rot;
 
+    Matrix4f X();
+    Matrix4f R();
     mat4 modelMat();
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 

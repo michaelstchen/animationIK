@@ -12,4 +12,6 @@ void specialKeys(int key, int x, int y);
 
 mat4 getViewMat();
 
+bool isWireFrame();
+
 #endif

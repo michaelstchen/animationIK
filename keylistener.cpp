@@ -5,6 +5,8 @@
 
 #include "keylistener.h"
 
+bool wireframemode = false;
+
 vec3 camPos = vec3(20, 20, 20);
 vec3 origin = vec3(0, 0, 0);
 vec3 up = vec3(0,0,1);
@@ -20,6 +22,8 @@ void normalKeys(unsigned char key, int x, int y) {
     } else if (key == 45) {
         // 45 represents '+' key
         viewMat = glm::scale(viewMat, vec3(0.95f, 0.95f, 0.95f));
+    } else if (key == 99) {
+        wireframemode = !wireframemode;
     }
 }
 
@@ -38,4 +42,8 @@ void specialKeys(int key, int x, int y) {
 
 glm::mat4 getViewMat() {
     return viewMat;
+}
+
+bool isWireFrame() {
+    return wireframemode;
 }

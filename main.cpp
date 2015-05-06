@@ -1,3 +1,4 @@
+#include <iostream>
 #include <stdio.h>
 #include <string.h>
 #include <vector>
@@ -10,6 +11,8 @@
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/ext.hpp>
+#include <glm/gtx/string_cast.hpp>
 using namespace glm;
 
 #include "shader.h"
@@ -34,10 +37,9 @@ std::vector< vec3 > vertices;
 std::vector< vec3 > normals;
 
 std::vector< Joint* > skeleton;
-Joint joint0 = Joint(NULL, 5.0f);
-Joint joint1 = Joint(&joint0, 5.0f);
-Joint joint2 = Joint(&joint1, 5.0f);
-Joint joint3 = Joint(&joint2, 5.0f);
+Joint* joint0; Joint* joint1;
+Joint* joint2; Joint* joint3;
+
 
 mat4 MVP;
 
@@ -78,10 +80,20 @@ void renderScene() {
     glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 );
     
+    if (isWireFrame()) {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+    } else {
+        glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    }
+    std::cout << "\n";
+    std::cout << "\n";
     // Draw the joints
     for (int i = 0; i < skeleton.size(); i++) {
-        // Model matrix : an identity matrix (model will be at the origin)
+        // Model matrix
         mat4 Model = skeleton[i]->modelMat();
+        std::cout << "\n";
+        std::cout<<glm::to_string(Model)<<std::endl;
+        std::cout << "\n";
         // Our ModelViewProjection : multiplication of our 3 matrices
         MVP = Projection * View * Model;
 
@@ -93,7 +105,8 @@ void renderScene() {
 
         glDrawArrays(GL_TRIANGLES, 0, vertices.size());
     }
-
+    std::cout << "\n";
+    std::cout << "\n";
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
 
@@ -164,10 +177,15 @@ int main(int argc, char **argv) {
     glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
     glBufferData(GL_ARRAY_BUFFER, normals.size() * sizeof(glm::vec3), &normals[0], GL_STATIC_DRAW);
 
-    skeleton.push_back(&joint0);
-    skeleton.push_back(&joint1);
-    skeleton.push_back(&joint2);
-    skeleton.push_back(&joint3);
+    joint0 = new Joint(NULL, joint1, 5.0f);
+    joint1 = new Joint(joint0, joint2, 5.0f);
+    joint2 = new Joint(joint1, joint3, 5.0f);
+    joint3 = new Joint(joint2, NULL, 5.0f);
+
+    skeleton.push_back(joint0);
+    skeleton.push_back(joint1);
+    skeleton.push_back(joint2);
+    skeleton.push_back(joint3);
 
 
     // enter GLUT event processing loop
