@@ -85,7 +85,7 @@ Matrix3f Joint::J() {
     length_v << len, 0.0, 0.0, 1.0;
     Vector4f p_n = R() * length_v;
 
-    Matrix4f X_ni = X();
+    Matrix4f X_ni = Matrix4f::Identity();
     for (Joint* n = next; n != NULL; n = n->next) {
         X_ni = X_ni * n->X();
     }
@@ -96,11 +96,17 @@ Matrix3f Joint::J() {
     }
 
     Vector4f p_e = X_ni * p_n;
-
     Matrix4f jacob = -R_i0 * crossMat(p_e);
 
-    return jacob.block(1, 1, 3, 3);
+    return jacob.block(0, 0, 3, 3);
 }
+
+MatrixXf jacobian(vector<Joint*> & skel) {
+    MatrixXf jac(3, 12);
+    jac << skel[0]->J(), skel[1]->J(), skel[2]->J(), skel[3]->J();
+    return jac;   
+}
+
 
 
 mat4 modelMatHelper(Joint & j) {
@@ -136,23 +142,16 @@ int main(int argc, char **argv) {
     joint0->next = joint1;
     joint1->next = joint2;
     joint2->next = joint3;
-    joint3->prev = joint2;
-    joint2->prev = joint1;
-    joint1->prev = joint0;
 
-    cout << joint0->X();
+    vector<Joint*> skel;
+    skel.push_back(joint0);
+    skel.push_back(joint1);
+    skel.push_back(joint2);
+    skel.push_back(joint3);
+
+    cout << jacobian(skel);
     cout << "\n";
     cout << "\n";
-    cout << joint0->next->X();
-    cout << "\n";
-    cout << "\n";
-    cout << joint0->next->next->X();
-    cout << "\n";
-    cout << "\n";
-    cout << joint0->next->next->next->X();
-    cout << "\n";
-    cout << "\n";
-    cout << joint0->J();
 
     
 }
