@@ -14,8 +14,6 @@ using namespace Eigen;
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/ext.hpp>
-#include <glm/gtx/string_cast.hpp>
 using namespace glm;
 
 #include "shader.h"
@@ -90,7 +88,7 @@ void renderScene() {
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     }
 
-    goal << 20.0f, 0.0f, 0.0f, 1.0f;
+    goal << 7.0f, 0.0f, 5.0f, 1.0f;
     IKsolver(skeleton, goal);
 
     // Draw the joints

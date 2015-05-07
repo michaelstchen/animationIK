@@ -9,7 +9,7 @@ RM = /bin/rm -f
 
 all: main
 
-main: clean main.cpp $(FILES)
+main: main.cpp $(FILES)
 	$(CC) $(LIBS) $(CFLAGS) -o as4 main.cpp $(FILES) $(LDFLAGS) 
 
 clean: 

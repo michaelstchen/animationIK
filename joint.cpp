@@ -9,7 +9,7 @@ Joint::Joint(Joint* p, Joint* n, float length) {
     
     prev = p; next = n;
     len = length;
-    rot << 0.1f, 0.2f, PI / 6.0f, 0.0f;
+    rot << 0.0f, 0.0f, PI / 12.0f, 0.0f;
 }
 
 // glm matrix accesses are m[col][row] while
@@ -134,11 +134,13 @@ Vector4f getEffector(vector<Joint*> & skel) {
 }
 
 void IKsolver(vector<Joint*> & skel, Vector4f & goal) {
-    if ((goal - getEffector(skel)).block(0,0,3,1).norm() < 0.1) {
+    if ((goal - getEffector(skel)).block(0,0,3,1).norm() < 0.01) {
         return;
     }
 
-    Vector3f dp = (goal - getEffector(skel)).block(0,0,3,1) * 0.001;
+    Vector3f dp = (goal - getEffector(skel)).block(0,0,3,1);
+    dp.normalize();
+    dp = dp * 0.02f;
     MatrixXf dr = jacobian(skel).jacobiSvd(Eigen::ComputeThinU|Eigen::ComputeThinV).solve(dp);
 
     for (int i = 0; i < skel.size(); i++) {
