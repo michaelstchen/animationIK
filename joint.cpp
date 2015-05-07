@@ -9,7 +9,7 @@ Joint::Joint(Joint* p, Joint* n, float length) {
     
     prev = p; next = n;
     len = length;
-    rot << 0.0f, 0.0f, 0.0f, 0.0f;
+    rot << 0.1f, 0.2f, PI / 6.0f, 0.0f;
 }
 
 // glm matrix accesses are m[col][row] while
@@ -20,6 +20,19 @@ mat4 eigen_to_glm(Matrix4f m) {
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             model[i][j] = m(j, i);
+        }
+    }
+
+    return model;
+    
+}
+
+Matrix4f glm_to_eigen(mat4 m) {
+    Matrix4f model;
+
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            model(j, i) = m[i][j];
         }
     }
 
@@ -57,6 +70,8 @@ Matrix4f rodriguez(Vector4f & r) {
         - r_cross * r_cross * cos(angle);
 
     rot(3, 3) = 1.0f;
+    rot(2, 3) = 0.0f; rot(1, 3) = 0.0f; rot(0, 3) = 0.0f;
+    rot(3, 2) = 0.0f; rot(3, 1) = 0.0f; rot(3, 0) = 0.0f;
     
     return rot;
     
@@ -81,18 +96,23 @@ Matrix4f Joint::R() {
 
 
 Matrix3f Joint::J() {
+    Joint* end = this;
+    while (end->next != NULL) {
+        end = end->next;
+    }
+
     Vector4f length_v;
-    length_v << len, 0.0, 0.0, 1.0;
-    Vector4f p_n = R() * length_v;
+    length_v << end->len, 0.0, 0.0, 1.0;
+    Vector4f p_n = end->R() * length_v;
 
     Matrix4f X_ni = Matrix4f::Identity();
-    for (Joint* n = next; n != NULL; n = n->next) {
+    for (Joint* n = this; n->next !=NULL; n = n->next) {
         X_ni = X_ni * n->X();
     }
 
     Matrix4f R_i0 = Matrix4f::Identity();
     for (Joint* n = prev; n != NULL; n = n->prev) {
-        R_i0 = R_i0 * prev->R();
+        R_i0 = R_i0 * n->R();
     }
 
     Vector4f p_e = X_ni * p_n;
@@ -107,7 +127,26 @@ MatrixXf jacobian(vector<Joint*> & skel) {
     return jac;   
 }
 
+Vector4f getEffector(vector<Joint*> & skel) {
+    Vector4f length_v;
+    length_v << skel[3]->len, 0.0, 0.0, 1.0;
+    return glm_to_eigen(skel[3]->modelMat()) * length_v;
+}
 
+void IKsolver(vector<Joint*> & skel, Vector4f & goal) {
+    if ((goal - getEffector(skel)).block(0,0,3,1).norm() < 0.1) {
+        return;
+    }
+
+    Vector3f dp = (goal - getEffector(skel)).block(0,0,3,1) * 0.001;
+    MatrixXf dr = jacobian(skel).jacobiSvd(Eigen::ComputeThinU|Eigen::ComputeThinV).solve(dp);
+
+    for (int i = 0; i < skel.size(); i++) {
+        skel[i]->rot(0) += dr(i*3 + 0);
+        skel[i]->rot(1) += dr(i*3 + 1);
+        skel[i]->rot(2) += dr(i*3 + 2);
+    }
+}
 
 mat4 modelMatHelper(Joint & j) {
     if (j.prev == NULL) {
@@ -124,34 +163,42 @@ mat4 Joint::modelMat() {
     }
 
     mat4 toWorld = modelMatHelper(*prev);
-
     return toWorld * eigen_to_glm(R());
 
 }
 
 
-int main(int argc, char **argv) {
-    Joint* joint0; Joint* joint1;
-    Joint* joint2; Joint* joint3;
+// int main(int argc, char **argv) {
+//     Joint* joint0; Joint* joint1;
+//     Joint* joint2; Joint* joint3;
     
-    joint0 = new Joint(NULL, joint1, 1.0f);
-    joint1 = new Joint(joint0, joint2, 2.0f);
-    joint2 = new Joint(joint1, joint3, 3.0f);
-    joint3 = new Joint(joint2, NULL, 4.0f);
+//     joint0 = new Joint(NULL, joint1, 1.0f);
+//     joint1 = new Joint(joint0, joint2, 0.5f);
+//     joint2 = new Joint(joint1, joint3, 0.25f);
+//     joint3 = new Joint(joint2, NULL, 0.13f);
     
-    joint0->next = joint1;
-    joint1->next = joint2;
-    joint2->next = joint3;
+//     joint0->next = joint1;
+//     joint1->next = joint2;
+//     joint2->next = joint3;
 
-    vector<Joint*> skel;
-    skel.push_back(joint0);
-    skel.push_back(joint1);
-    skel.push_back(joint2);
-    skel.push_back(joint3);
+//     vector<Joint*> skel;
+//     skel.push_back(joint0);
+//     skel.push_back(joint1);
+//     skel.push_back(joint2);
+//     skel.push_back(joint3);
 
-    cout << jacobian(skel);
-    cout << "\n";
-    cout << "\n";
+//     Vector4f goal;
+//     goal << 1.0f, 1.0f, 1.0f, 1.0f;
 
-    
-}
+//     cout << jacobian(skel);
+//     cout << "\n";
+//     cout << "\n";
+
+//     for (int i = 0; i < 2; i++) {
+//         IKsolver(skel, goal);
+//         cout << jacobian(skel);
+//         cout << "\n";
+//         cout << "\n";
+//     } 
+            
+// }

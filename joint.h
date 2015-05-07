@@ -30,6 +30,6 @@ class Joint {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
-
+void IKsolver(vector<Joint*> & skel, Vector4f & goal);
 
 #endif

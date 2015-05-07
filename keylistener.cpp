@@ -7,9 +7,9 @@
 
 bool wireframemode = false;
 
-vec3 camPos = vec3(20, 20, 20);
-vec3 origin = vec3(0, 0, 0);
-vec3 up = vec3(0,0,1);
+vec3 camPos = vec3(0, 0, 30);
+vec3 origin = vec3(10, 0, 0);
+vec3 up = vec3(1,0,0);
 vec3 right = glm::normalize(glm::cross(origin - camPos, up)); 
 
 mat4 viewMat = glm::lookAt(camPos, origin, up);

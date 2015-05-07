@@ -3,6 +3,9 @@
 #include <string.h>
 #include <vector>
 
+#include <Eigen/Dense>
+using namespace Eigen;
+
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include <GL/freeglut.h>
@@ -40,6 +43,7 @@ std::vector< Joint* > skeleton;
 Joint* joint0; Joint* joint1;
 Joint* joint2; Joint* joint3;
 
+Vector4f goal;
 
 mat4 MVP;
 
@@ -85,6 +89,9 @@ void renderScene() {
     } else {
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     }
+
+    goal << 20.0f, 0.0f, 0.0f, 1.0f;
+    IKsolver(skeleton, goal);
 
     // Draw the joints
     for (int i = 0; i < skeleton.size(); i++) {
