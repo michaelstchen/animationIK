@@ -57,13 +57,12 @@ Matrix4f crossMat(Vector4f & v) {
 Matrix4f rodriguez(Vector4f & r) {
     float angle = sqrt(r[0]*r[0] + r[1]*r[1] + r[2]*r[2]);
 
-    Vector4f r_norm;
-    if (angle != 0) {
-        r_norm = r / angle;
-    } else {
-        r_norm.setIdentity();
+    if (angle == 0.0f) {
+        return Matrix4f::Identity();
     }
-    
+
+    Vector4f r_norm;
+    r_norm = r / angle;
     Matrix4f r_cross = crossMat(r_norm);
 
     Matrix4f rot = r_norm * r_norm.transpose()
@@ -114,7 +113,7 @@ Matrix3f Joint::J() {
     Matrix4f R_i0 = Matrix4f::Identity();
     for (Joint* n = prev; n != NULL; n = n->prev) {
         //R_i0 = n->R() * R_i0;
-        R_i0 = R_i0 * n->R();
+        R_i0 = n->R() * R_i0;
     }
 
     Vector4f p_e = X_ni * p_n;
@@ -122,17 +121,46 @@ Matrix3f Joint::J() {
 
     return jacob.block(0, 0, 3, 3);
 }
+MatrixXf jacobian2(vector<Joint*> & skel) {
+    MatrixXf jac(3, 6);
+
+    float eps = 0.000001f;
+    int index = 0;
+    for (int i = 0; i < skel.size(); i++) {
+        for (int j = 0; j < 3; j++) {
+            skel[i]->rot(j) += eps;
+            Vector4f plus = getEffector(skel);
+
+            skel[i]->rot(j) -= 2.0f * eps;
+            Vector4f minus = getEffector(skel);
+
+            skel[i]->rot(j) += eps;
+
+            jac.col(index) = ((plus - minus) / (2.0f * eps)).block(0,0,3,1);
+            index++;
+
+        }
+    }
+
+    return jac;
+}
 
 MatrixXf jacobian(vector<Joint*> & skel) {
-    MatrixXf jac(3, 12);
-    jac << skel[0]->J(), skel[1]->J(), skel[2]->J(), skel[3]->J();
+    //MatrixXf jac(3, 12);
+    //jac << skel[0]->J(), skel[1]->J(), skel[2]->J(), skel[3]->J();
+
+    MatrixXf jac(3, 6);
+    jac << skel[0]->J(), skel[1]->J();    
     return jac;   
 }
 
 Vector4f getEffector(vector<Joint*> & skel) {
     Vector4f length_v;
-    length_v << skel[3]->len, 0.0, 0.0, 1.0;
-    return glm_to_eigen(skel[3]->modelMat()) * length_v;
+    //length_v << skel[3]->len, 0.0, 0.0, 1.0;
+    //return glm_to_eigen(skel[3]->modelMat()) * length_v;
+
+    length_v << skel[1]->len, 0.0, 0.0, 1.0;
+    return glm_to_eigen(skel[1]->modelMat()) * length_v;
 }
 
 
@@ -151,13 +179,24 @@ int IKsolver(vector<Joint*> & skel, Vector4f & goal, float delta) {
     cout << "desired dp:\n";
     cout << dp;
     cout << "\n\n";
-    MatrixXf dr = jacobian(skel).jacobiSvd(Eigen::ComputeThinU|Eigen::ComputeThinV).solve(dp);
+
+    MatrixXf dr = jacobian2(skel).jacobiSvd(Eigen::ComputeThinU|Eigen::ComputeThinV).solve(dp);
 
     for (int i = 0; i < skel.size(); i++) {
         skel[i]->rot(0) += dr(i*3 + 0);
         skel[i]->rot(1) += dr(i*3 + 1);
         skel[i]->rot(2) += dr(i*3 + 2);
     }
+
+    cout << "the dr:\n";
+    cout << dr;
+    cout << "\n\n";
+    cout << "the effector:\n";
+    cout << getEffector(skel);
+    cout << "\n\n";
+    cout << "the jacobian:\n";
+    cout << jacobian2(skel);
+    cout << "\n\n\n\n\n";
 
     // Vector3f newDist = (goal - getEffector(skel)).block(0,0,3,1);
     // if (newDist.norm() > currDist.norm()) {
@@ -174,6 +213,7 @@ int IKsolver(vector<Joint*> & skel, Vector4f & goal, float delta) {
 
     return 1;
 }
+
 
 mat4 modelMatHelper(Joint & j) {
     if (j.prev == NULL) {
@@ -196,34 +236,53 @@ mat4 Joint::modelMat() {
 
 
 int main(int argc, char **argv) {
-    Joint* joint0; Joint* joint1;
-    Joint* joint2; Joint* joint3;
+    // Joint* joint0; Joint* joint1;
+    // Joint* joint2; Joint* joint3;
     
-    joint0 = new Joint(NULL, joint1, 5.0f);
-    joint1 = new Joint(joint0, joint2, 5.0f);
-    joint2 = new Joint(joint1, joint3, 5.0f);
-    joint3 = new Joint(joint2, NULL, 5.0f);
+    // joint0 = new Joint(NULL, joint1, 5.0f);
+    // joint1 = new Joint(joint0, joint2, 5.0f);
+    // joint2 = new Joint(joint1, joint3, 5.0f);
+    // joint3 = new Joint(joint2, NULL, 5.0f);
     
-    joint0->next = joint1;
-    joint1->next = joint2;
-    joint2->next = joint3;
+    // joint0->next = joint1;
+    // joint1->next = joint2;
+    // joint2->next = joint3;
 
-    vector<Joint*> skel;
-    skel.push_back(joint0);
-    skel.push_back(joint1);
-    skel.push_back(joint2);
-    skel.push_back(joint3);
+    // vector<Joint*> skel;
+    // skel.push_back(joint0);
+    // skel.push_back(joint1);
+    // skel.push_back(joint2);
+    // skel.push_back(joint3);
 
-    Vector4f goal;
-    goal << 7.0f, 0.0f, 5.0f, 1.0f;
+    // Vector4f goal;
+    // goal << 7.0f, 0.0f, 5.0f, 1.0f;
 
-    for (int i = 0; i < 2; i++) {
+
+
+    // Joint* joint0; Joint* joint1;
+    
+    // joint0 = new Joint(NULL, joint1, 5.0f);
+    // joint1 = new Joint(joint0, NULL, 5.0f);
+    
+    // joint0->next = joint1;
+
+    // vector<Joint*> skel;
+    // skel.push_back(joint0);
+    // skel.push_back(joint1);
+
+    // Vector4f goal;
+    // goal << 0.0f, 9.0f, 0.0f, 1.0f;
+
+    // cout << "the effector:\n";
+    // cout << getEffector(skel);
+    // cout << "\n\n";
+    // cout << "the jacobian:\n";
+    // cout << jacobian2(skel);
+    // cout << "\n\n";
+
+    for (int i = 0; i < 4; i++) {
         IKsolver(skel, goal, 0.01f);
-        cout << "the effector:\n";
-        cout << getEffector(skel);
-        cout << "\n\n";
         
     }
     
-            
 }
