@@ -166,7 +166,7 @@ Vector4f getEffector(vector<Joint*> & skel) {
 
 int IKsolver(vector<Joint*> & skel, Vector4f & goal, float delta) {
     Vector3f currDist = (goal - getEffector(skel)).block(0,0,3,1);
-    if (currDist.norm() < 0.01) {
+    if (currDist.norm() < 0.05) {
         return 0;
     }
 

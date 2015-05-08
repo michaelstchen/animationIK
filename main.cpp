@@ -93,17 +93,14 @@ void renderScene() {
     vec3 goal_glm = goal_verts[currgoalInd];
     Vector4f goal_eigen;
     goal_eigen << goal_glm[0], goal_glm[1], goal_glm[2], 1.0f;
-    // cout << "\n\nstart\n";
-    // cout << getEffector(skeleton);
-    if (IKsolver(skeleton, goal_eigen, 0.01f) == 0) {
+
+    if (IKsolver(skeleton, goal_eigen, 0.03f) == 0) {
         if (currgoalInd >= goal_verts.size() - 1) {
             currgoalInd = 0;
         } else {
             currgoalInd++;
         }
     }
-    // cout << "\nend\n";
-    // cout << getEffector(skeleton);
 
     // Draw the joints
     for (int i = 0; i < skeleton.size(); i++) {
