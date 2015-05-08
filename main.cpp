@@ -77,7 +77,7 @@ void renderScene() {
     // Camera matrix
     mat4 View = getViewMat();
 
-    vec3 lightPos = vec3(5, 5, 10);
+    vec3 lightPos = vec3(15, 0, 10);
     glUniform3f(LightID, lightPos.x, lightPos.y, lightPos.z);
     
     if (isWireFrame()) {
@@ -195,8 +195,10 @@ void windowResize(int w, int h) {
 }
 
 void populateGoalVerts(vector<vec3> & v) {
-    for (float theta = 0.0f; theta < 2.0f * PI + 0.1f; theta += 0.1f) {
-        v.push_back(vec3(10.0f, 10.0f*cos(theta), 10.0f*sin(theta)));
+    for (float theta = 0.0f; theta < 6.0f * PI; theta += 0.1f) {
+        v.push_back(vec3(2.0f* theta, 
+                         5.0f*cos(theta) - 5.0f - 0.001f, 
+                         7.5f*sin(theta) + 0.001f));
     }
     currgoalInd = 0;
 
@@ -245,10 +247,10 @@ int main(int argc, char **argv) {
     stageprogram = LoadShaders("Shaders/StageVert.vs",
                               "Shaders/StageFrag.fs");
 
-    joint0 = new Joint(NULL, joint1, 7.0f);
-    joint1 = new Joint(joint0, joint2, 6.0f);
-    joint2 = new Joint(joint1, joint3, 5.0f);
-    joint3 = new Joint(joint2, NULL, 4.0f);
+    joint0 = new Joint(NULL, joint1, 10.0f);
+    joint1 = new Joint(joint0, joint2, 3.5f);
+    joint2 = new Joint(joint1, joint3, 7.0f);
+    joint3 = new Joint(joint2, NULL, 3.5f);
 
     skeleton.push_back(joint0);
     skeleton.push_back(joint1);

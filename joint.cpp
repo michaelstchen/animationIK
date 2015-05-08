@@ -146,11 +146,8 @@ MatrixXf jacobian2(vector<Joint*> & skel) {
 }
 
 MatrixXf jacobian(vector<Joint*> & skel) {
-    //MatrixXf jac(3, 12);
-    //jac << skel[0]->J(), skel[1]->J(), skel[2]->J(), skel[3]->J();
-
-    MatrixXf jac(3, 6);
-    jac << skel[0]->J(), skel[1]->J();    
+    MatrixXf jac(3, 12);
+    jac << skel[0]->J(), skel[1]->J(), skel[2]->J(), skel[3]->J();   
     return jac;   
 }
 
@@ -159,12 +156,30 @@ Vector4f getEffector(vector<Joint*> & skel) {
     length_v << skel[3]->len, 0.0, 0.0, 1.0;
     return glm_to_eigen(skel[3]->modelMat()) * length_v;
 
-    // length_v << skel[1]->len, 0.0, 0.0, 1.0;
-    // return glm_to_eigen(skel[1]->modelMat()) * length_v;
 }
 
 
-int IKsolver(vector<Joint*> & skel, Vector4f & goal, float delta) {
+float skel_len(vector<Joint*> & skel) {
+    float max_len = 0.0f;
+    for (int i = 0; i < skel.size(); i++) {
+        max_len += skel[i]->len;
+    }
+    return max_len;
+}
+
+
+int IKsolver(vector<Joint*> & skel, Vector4f & g, float delta) {
+    float max_len = skel_len(skel);
+    float orig_to_goal = g.block(0,0,3,1).norm();
+
+    Vector4f goal;
+    goal << g(0), g(1), g(2), g(3);
+    if (orig_to_goal > max_len) {
+        goal.normalize();
+        goal = goal * (max_len - 0.01);
+    } 
+    
+
     Vector3f currDist = (goal - getEffector(skel)).block(0,0,3,1);
     if (currDist.norm() < 0.05) {
         return 0;

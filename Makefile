@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -g -DGL_GLEXT_PROTOTYPES 
+CFLAGS = -g -DGL_GLEXT_PROTOTYPES
 LIBS = -Ieigen-3.2.4 -Iglm-0.9.6.3
 LDFLAGS = -lglut -lGLU -lGL -lGLEW
 
