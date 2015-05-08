@@ -20,10 +20,12 @@ void normalKeys(unsigned char key, int x, int y) {
     if (key == 27) {
         exit(0);
     } else if (key == 61) {
-        camPos = camPos * 0.95f;
+        vec3 cam_to_origin = origin - camPos;
+        camPos = camPos + (cam_to_origin * 0.05f);
         viewMat = glm::lookAt(camPos, origin, up);
     } else if (key == 45) {
-        camPos = camPos * 1.05f;
+        vec3 cam_to_origin = origin - camPos;
+        camPos = camPos - (cam_to_origin * 0.05f);
         viewMat = glm::lookAt(camPos, origin, up);
     } else if (key == 99) {
         wireframemode = !wireframemode;

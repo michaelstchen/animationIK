@@ -93,7 +93,7 @@ void renderScene() {
     // }
 
     // Draw the joints
-    for (int i = 0; i < skeleton.size(); i++) {
+    for (int i = 0; i < joint_verts.size(); i++) {
         // 1st attribute buffer : vertices
         glEnableVertexAttribArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, joint_vertbuff);
@@ -198,7 +198,7 @@ int main(int argc, char **argv) {
         vector<vec3> newjoint_n;
 
         loadOBJ("Inputs/joint.obj", newjoint_v, newjoint_n);
-        newjoint_v[0][0] = skeleton[i]->len;
+        //newjoint_v[0][0] = skeleton[i]->len;
 
         joint_verts.push_back(newjoint_v);
         joint_norms.push_back(newjoint_n);
@@ -207,7 +207,7 @@ int main(int argc, char **argv) {
     glGenBuffers(1, &joint_vertbuff);
     glBindBuffer(GL_ARRAY_BUFFER, joint_vertbuff);
     glBufferData(GL_ARRAY_BUFFER, joint_verts[0].size()
-                 * sizeof(glm::vec3), &joint_verts[0], GL_STATIC_DRAW);
+                 * sizeof(glm::vec3), &joint_verts[0][0], GL_STATIC_DRAW);
 
     // for (int i = 0; i < 1; i++) {
     //     glBufferSubData(GL_ARRAY_BUFFER, i * joint_verts[i].size() *
@@ -218,7 +218,7 @@ int main(int argc, char **argv) {
     glGenBuffers(1, &joint_normbuff);
     glBindBuffer(GL_ARRAY_BUFFER, joint_normbuff);
     glBufferData(GL_ARRAY_BUFFER, joint_norms[0].size()
-                 * sizeof(glm::vec3), &joint_norms[0], GL_STATIC_DRAW);
+                 * sizeof(glm::vec3), &joint_norms[0][0], GL_STATIC_DRAW);
     // for (int i = 0; i < 1; i++) {
     //     glBufferSubData(GL_ARRAY_BUFFER, i * joint_norms[i].size() *
     //                     sizeof(vec3), joint_norms[i].size() * sizeof(vec3),
