@@ -28,12 +28,13 @@ using namespace glm;
 int windowWidth = 800;
 int windowHeight = 600;
 
-GLuint smoothprogram;
+GLuint goalprogram;
 GLuint flatprogram;
 GLuint VertexArrayID;
 
 GLuint joint_vertbuffs[4];
 GLuint joint_normbuffs[4];
+GLuint goal_buff;
 
 std::vector< vec3 > goal_verts;
 std::vector< vector < vec3 > > joint_verts;
@@ -55,8 +56,18 @@ void renderScene() {
     // clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    GLuint programID = goalprogram;
+    glUseProgram(programID);
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, goal_buff);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+
+    glDrawArrays(GL_POINTS, 0, goal_verts.size());
+    glDisableVertexAttribArray(0);
+
     // Choose shader
-    GLuint programID = flatprogram;
+    programID = flatprogram;
     glUseProgram(programID);
 
     // Get a handles
@@ -121,6 +132,7 @@ void renderScene() {
         glDisableVertexAttribArray(1);
     }
 
+
     // swap buffers
     glutSwapBuffers();
 }
@@ -175,18 +187,18 @@ int main(int argc, char **argv) {
     // Create and compile our GLSL program from the shaders
     flatprogram = LoadShaders("Shaders/FlatVertex.vs",
                             "Shaders/FlatFragment.fs" );
+    goalprogram = LoadShaders("Shaders/GoalVert.vs",
+                              "Shaders/GoalFrag.fs");
 
-    joint0 = new Joint(NULL, joint1, 5.0f);
-    joint1 = new Joint(joint0, joint2, 7.0f);
-    joint2 = new Joint(joint1, joint3, 6.0f);
+    joint0 = new Joint(NULL, joint1, 7.0f);
+    joint1 = new Joint(joint0, joint2, 6.0f);
+    joint2 = new Joint(joint1, joint3, 5.0f);
     joint3 = new Joint(joint2, NULL, 4.0f);
 
     skeleton.push_back(joint0);
     skeleton.push_back(joint1);
     skeleton.push_back(joint2);
     skeleton.push_back(joint3);
-
-    populateGoalVerts(goal_verts);
 
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
@@ -206,11 +218,21 @@ int main(int argc, char **argv) {
     glGenBuffers(skeleton.size(), joint_normbuffs);
     for (int i = 0; i < skeleton.size(); i++) {
         glBindBuffer(GL_ARRAY_BUFFER, joint_vertbuffs[i]);
-        glBufferData(GL_ARRAY_BUFFER, joint_verts[i].size() * sizeof(glm::vec3), &joint_verts[i][0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER,
+                     joint_verts[i].size() * sizeof(glm::vec3),
+                     &joint_verts[i][0], GL_STATIC_DRAW);
 
         glBindBuffer(GL_ARRAY_BUFFER, joint_normbuffs[i]);
-        glBufferData(GL_ARRAY_BUFFER, joint_norms[i].size() * sizeof(glm::vec3), &joint_norms[i][0], GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER,
+                     joint_norms[i].size() * sizeof(glm::vec3),
+                     &joint_norms[i][0], GL_STATIC_DRAW);
     }
+
+    populateGoalVerts(goal_verts);
+    glGenBuffers(1, &goal_buff);
+    glBindBuffer(GL_ARRAY_BUFFER, goal_buff);
+    glBufferData(GL_ARRAY_BUFFER, goal_verts.size() * sizeof(glm::vec3),
+                 &goal_verts[0], GL_STATIC_DRAW);
 
     // enter GLUT event processing loop
     glutMainLoop();
