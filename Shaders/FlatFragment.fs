@@ -16,11 +16,11 @@ void main(){
 
 	// Light properties
 	vec3 LightColor = vec3(1,1,1);
-	float LightPower = 30.0f;
+	float LightPower = 5.0f;
 	
 	// Material properties
-	vec3 MaterialDiffuseColor = vec3(1.0, 0.0, 0.0);
-	vec3 MaterialAmbientColor = vec3(0.1,0.1,0.1) * MaterialDiffuseColor;
+	vec3 MaterialDiffuseColor = vec3(0.75, 0.0, 0.75);
+	vec3 MaterialAmbientColor = vec3(0.2,0.2,0.2) * MaterialDiffuseColor;
 	vec3 MaterialSpecularColor = vec3(0.0,0.0,0.0);
 
 	// Distance to the light
@@ -36,7 +36,9 @@ void main(){
 	float cosAlpha = clamp( dot( E,R ), 0,1 );
 	
 	color = MaterialAmbientColor
-		+ MaterialDiffuseColor * LightColor * LightPower * cosTheta / (distance*distance)
-		+ MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / (distance*distance);
+		+ MaterialDiffuseColor * LightColor * LightPower * cosTheta / distance
+		+ MaterialSpecularColor * LightColor * LightPower * pow(cosAlpha,5) / distance;
+
+
 
 }

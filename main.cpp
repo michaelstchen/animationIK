@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <vector>
+#include <cmath>
 
 #include <Eigen/Dense>
 using namespace Eigen;
@@ -34,6 +35,7 @@ GLuint VertexArrayID;
 GLuint vertexbuffer;
 GLuint normalbuffer;
 
+std::vector< vec3 > goal_verts;
 std::vector< vec3 > vertices;
 std::vector< vec3 > normals;
 
@@ -41,7 +43,7 @@ std::vector< Joint* > skeleton;
 Joint* joint0; Joint* joint1;
 Joint* joint2; Joint* joint3;
 
-Vector4f goal;
+int currgoalInd;
 
 mat4 MVP;
 
@@ -64,8 +66,8 @@ void renderScene() {
     GLuint LightID = glGetUniformLocation(programID,
                                           "LightPosition_worldspace");
 
-    mat4 Projection = glm::perspective(degToRad(45.0f), 4.0f/3.0f, 0.1f, 100.0f);
-    //mat4 Projection = glm::ortho(-7.0f,7.0f,-4.0f,4.0f,0.0f,100.0f);
+    mat4 Projection = glm::perspective(degToRad(45.0f), 4.0f/3.0f,
+                                       0.1f, 100.0f);
     // Camera matrix
     mat4 View = getViewMat();
 
@@ -88,8 +90,20 @@ void renderScene() {
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     }
 
-    goal << 7.0f, 0.0f, 5.0f, 1.0f;
-    IKsolver(skeleton, goal);
+    vec3 goal_glm = goal_verts[currgoalInd];
+    Vector4f goal_eigen;
+    goal_eigen << goal_glm[0], goal_glm[1], goal_glm[2], 1.0f;
+    // cout << "\n\nstart\n";
+    // cout << getEffector(skeleton);
+    if (IKsolver(skeleton, goal_eigen, 0.01f) == 0) {
+        if (currgoalInd >= goal_verts.size() - 1) {
+            currgoalInd = 0;
+        } else {
+            currgoalInd++;
+        }
+    }
+    // cout << "\nend\n";
+    // cout << getEffector(skeleton);
 
     // Draw the joints
     for (int i = 0; i < skeleton.size(); i++) {
@@ -119,6 +133,12 @@ void windowResize(int w, int h) {
     /* Don't change the viewport */
 }
 
+void populateGoalVerts(vector<vec3> & v) {
+    for (float theta = 0.0f; theta < 2.0f * PI + 0.1f; theta += 0.1f) {
+        v.push_back(vec3(10.0f, 10.0f*cos(theta), 10.0f*sin(theta)));
+    }
+    currgoalInd = 0;
+}
 
 //****************************************************
 // Program Start Point
@@ -187,6 +207,7 @@ int main(int argc, char **argv) {
     skeleton.push_back(joint2);
     skeleton.push_back(joint3);
 
+    populateGoalVerts(goal_verts);
 
     // enter GLUT event processing loop
     glutMainLoop();
