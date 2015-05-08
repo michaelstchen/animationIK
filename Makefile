@@ -13,7 +13,7 @@ main: main.cpp $(FILES)
 	$(CC) $(LIBS) $(CFLAGS) -o as4 main.cpp $(FILES) $(LDFLAGS) 
 
 clean: 
-	$(RM) *.o *~ as4 test
+	$(RM) *.o *~ Inputs/*~ Shaders/*~ as4 test
 
 check: joint.cpp
 	$(CC) $(LIBS) $(CFLAGS) -o test joint.cpp $(LDFLAGS)

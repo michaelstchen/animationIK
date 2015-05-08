@@ -18,5 +18,9 @@ bool loadOBJ(char* filename,
              vector<vec3> & out_normals,
              float len);
 
+bool loadOBJ(char* filename,
+             vector<vec3> & out_vertices,
+             vector<vec3> & out_normals);
+
 
 #endif

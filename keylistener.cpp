@@ -9,7 +9,7 @@
 
 bool wireframemode = false;
 
-vec3 camPos = vec3(0, 0, 30);
+vec3 camPos = vec3(20, 0, 30);
 vec3 origin = vec3(10, 0, 0);
 vec3 up = vec3(1,0,0);
 vec3 right = glm::normalize(glm::cross(origin - camPos, up)); 
@@ -42,7 +42,7 @@ void specialKeys(int key, int x, int y) {
             viewMat = glm::lookAt(camPos, origin, up);
         } else {
             camPos = camPos - origin;
-            mat4 rot = glm::rotate(mat4(1.0f), degToRad(2.0f), up);
+            mat4 rot = glm::rotate(mat4(1.0f), degToRad(2.0f), vec3(1.0f, 0.0f, 0.0f));
             right = vec3(rot * vec4(right, 1.0f));
             camPos = vec3(rot * vec4(camPos, 1.0f));
             camPos = camPos + origin;
