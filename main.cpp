@@ -117,7 +117,7 @@ void renderScene() {
         glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &Model[0][0]);
         glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
 
-        glDrawArrays(GL_TRIANGLES, 0, joint_verts[0].size());
+        glDrawArrays(GL_TRIANGLES, 0, joint_verts[i].size());
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
@@ -206,7 +206,7 @@ int main(int argc, char **argv) {
 
     glGenBuffers(1, &joint_vertbuff);
     glBindBuffer(GL_ARRAY_BUFFER, joint_vertbuff);
-    glBufferData(GL_ARRAY_BUFFER, joint_verts[0].size()
+    glBufferData(GL_ARRAY_BUFFER, joint_verts.size() * joint_verts[0].size()
                  * sizeof(glm::vec3), 0, GL_STATIC_DRAW);
 
     for (int i = 0; i < 1; i++) {
@@ -217,7 +217,7 @@ int main(int argc, char **argv) {
 
     glGenBuffers(1, &joint_normbuff);
     glBindBuffer(GL_ARRAY_BUFFER, joint_normbuff);
-    glBufferData(GL_ARRAY_BUFFER, joint_norms[0].size()
+    glBufferData(GL_ARRAY_BUFFER, joint_norms.size() * joint_norms[0].size()
                  * sizeof(glm::vec3), 0, GL_STATIC_DRAW);
     for (int i = 0; i < 1; i++) {
         glBufferSubData(GL_ARRAY_BUFFER, i * joint_norms[i].size() *
