@@ -207,23 +207,23 @@ int main(int argc, char **argv) {
     glGenBuffers(1, &joint_vertbuff);
     glBindBuffer(GL_ARRAY_BUFFER, joint_vertbuff);
     glBufferData(GL_ARRAY_BUFFER, joint_verts[0].size()
-                 * sizeof(glm::vec3), &joint_verts[0][0], GL_STATIC_DRAW);
+                 * sizeof(glm::vec3), 0, GL_STATIC_DRAW);
 
-    // for (int i = 0; i < 1; i++) {
-    //     glBufferSubData(GL_ARRAY_BUFFER, i * joint_verts[i].size() *
-    //                     sizeof(vec3), joint_verts[i].size() * sizeof(vec3),
-    //                     &joint_verts[i]);
-    // }
+    for (int i = 0; i < 1; i++) {
+        glBufferSubData(GL_ARRAY_BUFFER, i * joint_verts[i].size() *
+                        sizeof(vec3), joint_verts[i].size() * sizeof(vec3),
+                        &joint_verts[i][0]);
+    }
 
     glGenBuffers(1, &joint_normbuff);
     glBindBuffer(GL_ARRAY_BUFFER, joint_normbuff);
     glBufferData(GL_ARRAY_BUFFER, joint_norms[0].size()
-                 * sizeof(glm::vec3), &joint_norms[0][0], GL_STATIC_DRAW);
-    // for (int i = 0; i < 1; i++) {
-    //     glBufferSubData(GL_ARRAY_BUFFER, i * joint_norms[i].size() *
-    //                     sizeof(vec3), joint_norms[i].size() * sizeof(vec3),
-    //                     &joint_norms[i]);
-    // }
+                 * sizeof(glm::vec3), 0, GL_STATIC_DRAW);
+    for (int i = 0; i < 1; i++) {
+        glBufferSubData(GL_ARRAY_BUFFER, i * joint_norms[i].size() *
+                        sizeof(vec3), joint_norms[i].size() * sizeof(vec3),
+                        &joint_norms[i][0]);
+    }
 
     // enter GLUT event processing loop
     glutMainLoop();
