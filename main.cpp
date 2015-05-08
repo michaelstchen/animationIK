@@ -56,18 +56,8 @@ void renderScene() {
     // clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    GLuint programID = goalprogram;
-    glUseProgram(programID);
-    // 1st attribute buffer : vertices
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, goal_buff);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
-
-    glDrawArrays(GL_POINTS, 0, goal_verts.size());
-    glDisableVertexAttribArray(0);
-
     // Choose shader
-    programID = flatprogram;
+    GLuint programID = flatprogram;
     glUseProgram(programID);
 
     // Get a handles
@@ -133,6 +123,30 @@ void renderScene() {
     }
 
 
+    programID = goalprogram;
+    glUseProgram(programID);
+
+    // Get a handles
+    MatrixID = glGetUniformLocation(programID, "MVP");
+    Projection = glm::perspective(degToRad(45.0f), 4.0f/3.0f,
+                                       0.1f, 100.0f);
+    View = getViewMat();
+    // Our ModelViewProjection : multiplication of our 3 matrices
+    MVP = Projection * View;
+
+    // Send our transformation to the currently bound shader, 
+    // in the "MVP" uniform
+    glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, goal_buff);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
+
+    glDrawArrays(GL_LINE_LOOP, 0, goal_verts.size());
+    glDisableVertexAttribArray(0);
+
+
     // swap buffers
     glutSwapBuffers();
 }
@@ -147,6 +161,7 @@ void populateGoalVerts(vector<vec3> & v) {
         v.push_back(vec3(10.0f, 10.0f*cos(theta), 10.0f*sin(theta)));
     }
     currgoalInd = 0;
+
 }
 
 //****************************************************
