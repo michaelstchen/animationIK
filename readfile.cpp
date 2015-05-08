@@ -8,7 +8,8 @@
 
 bool loadOBJ(char* filename,
              vector<vec3> & out_vertices,
-             vector<vec3> & out_normals) {
+             vector<vec3> & out_normals,
+             float len) {
 
     FILE* finput = fopen(filename, "r");
     if (finput == NULL) {
@@ -17,6 +18,7 @@ bool loadOBJ(char* filename,
     }
 
     vector< vec3 > temp_v;
+    bool first_time = true;
 
     char line[100];
     while(fscanf(finput, "%s", line) != EOF) {
@@ -25,6 +27,12 @@ bool loadOBJ(char* filename,
             vec3 vertex;
             fscanf(finput, "%f %f %f\n",
                    &vertex.x, &vertex.y, &vertex.z );
+            
+            if (first_time) {
+                vertex[0] = len;
+                first_time = false;
+            }
+
             temp_v.push_back(vertex);
         } else if (strcmp(line, "f") == 0 ){
             int vInd[3];

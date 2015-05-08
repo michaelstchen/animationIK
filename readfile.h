@@ -15,7 +15,8 @@ using namespace glm;
 
 bool loadOBJ(char* filename,
              vector<vec3> & out_vertices,
-             vector<vec3> & out_normals);
+             vector<vec3> & out_normals,
+             float len);
 
 
 #endif

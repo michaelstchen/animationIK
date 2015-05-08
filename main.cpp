@@ -32,8 +32,8 @@ GLuint smoothprogram;
 GLuint flatprogram;
 GLuint VertexArrayID;
 
-GLuint joint_vertbuff;
-GLuint joint_normbuff;
+GLuint joint_vertbuffs[4];
+GLuint joint_normbuffs[4];
 
 std::vector< vec3 > goal_verts;
 std::vector< vector < vec3 > > joint_verts;
@@ -80,31 +80,29 @@ void renderScene() {
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
     }
 
-    // vec3 goal_glm = goal_verts[currgoalInd];
-    // Vector4f goal_eigen;
-    // goal_eigen << goal_glm[0], goal_glm[1], goal_glm[2], 1.0f;
+    vec3 goal_glm = goal_verts[currgoalInd];
+    Vector4f goal_eigen;
+    goal_eigen << goal_glm[0], goal_glm[1], goal_glm[2], 1.0f;
 
-    // if (IKsolver(skeleton, goal_eigen, 0.03f) == 0) {
-    //     if (currgoalInd >= goal_verts.size() - 1) {
-    //         currgoalInd = 0;
-    //     } else {
-    //         currgoalInd++;
-    //     }
-    // }
+    if (IKsolver(skeleton, goal_eigen, 0.03f) == 0) {
+        if (currgoalInd >= goal_verts.size() - 1) {
+            currgoalInd = 0;
+        } else {
+            currgoalInd++;
+        }
+    }
 
     // Draw the joints
     for (int i = 0; i < joint_verts.size(); i++) {
         // 1st attribute buffer : vertices
         glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, joint_vertbuff);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0,
-                              (void*) 0);
+        glBindBuffer(GL_ARRAY_BUFFER, joint_vertbuffs[i]);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
 
         // 2nd attribute buffer : normals
         glEnableVertexAttribArray(1);
-        glBindBuffer(GL_ARRAY_BUFFER, joint_normbuff);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0,
-                              (void*) 0);
+        glBindBuffer(GL_ARRAY_BUFFER, joint_normbuffs[i]);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*) 0);
 
         // Model matrix
         mat4 Model = skeleton[i]->modelMat();
@@ -179,9 +177,9 @@ int main(int argc, char **argv) {
                             "Shaders/FlatFragment.fs" );
 
     joint0 = new Joint(NULL, joint1, 5.0f);
-    joint1 = new Joint(joint0, joint2, 5.0f);
-    joint2 = new Joint(joint1, joint3, 5.0f);
-    joint3 = new Joint(joint2, NULL, 5.0f);
+    joint1 = new Joint(joint0, joint2, 7.0f);
+    joint2 = new Joint(joint1, joint3, 6.0f);
+    joint3 = new Joint(joint2, NULL, 4.0f);
 
     skeleton.push_back(joint0);
     skeleton.push_back(joint1);
@@ -197,32 +195,21 @@ int main(int argc, char **argv) {
         vector<vec3> newjoint_v;
         vector<vec3> newjoint_n;
 
-        loadOBJ("Inputs/joint.obj", newjoint_v, newjoint_n);
-        //newjoint_v[0][0] = skeleton[i]->len;
+        loadOBJ("Inputs/joint.obj", newjoint_v, newjoint_n,skeleton[i]->len);
 
         joint_verts.push_back(newjoint_v);
         joint_norms.push_back(newjoint_n);
     }
 
-    glGenBuffers(1, &joint_vertbuff);
-    glBindBuffer(GL_ARRAY_BUFFER, joint_vertbuff);
-    glBufferData(GL_ARRAY_BUFFER, joint_verts.size() * joint_verts[0].size()
-                 * sizeof(glm::vec3), 0, GL_STATIC_DRAW);
 
-    for (int i = 0; i < 1; i++) {
-        glBufferSubData(GL_ARRAY_BUFFER, i * joint_verts[i].size() *
-                        sizeof(vec3), joint_verts[i].size() * sizeof(vec3),
-                        &joint_verts[i][0]);
-    }
+    glGenBuffers(skeleton.size(), joint_vertbuffs);
+    glGenBuffers(skeleton.size(), joint_normbuffs);
+    for (int i = 0; i < skeleton.size(); i++) {
+        glBindBuffer(GL_ARRAY_BUFFER, joint_vertbuffs[i]);
+        glBufferData(GL_ARRAY_BUFFER, joint_verts[i].size() * sizeof(glm::vec3), &joint_verts[i][0], GL_STATIC_DRAW);
 
-    glGenBuffers(1, &joint_normbuff);
-    glBindBuffer(GL_ARRAY_BUFFER, joint_normbuff);
-    glBufferData(GL_ARRAY_BUFFER, joint_norms.size() * joint_norms[0].size()
-                 * sizeof(glm::vec3), 0, GL_STATIC_DRAW);
-    for (int i = 0; i < 1; i++) {
-        glBufferSubData(GL_ARRAY_BUFFER, i * joint_norms[i].size() *
-                        sizeof(vec3), joint_norms[i].size() * sizeof(vec3),
-                        &joint_norms[i][0]);
+        glBindBuffer(GL_ARRAY_BUFFER, joint_normbuffs[i]);
+        glBufferData(GL_ARRAY_BUFFER, joint_norms[i].size() * sizeof(glm::vec3), &joint_norms[i][0], GL_STATIC_DRAW);
     }
 
     // enter GLUT event processing loop
