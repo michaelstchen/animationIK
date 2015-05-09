@@ -231,8 +231,8 @@ int main(int argc, char **argv) {
     glutSpecialFunc(specialKeys);
 
     // Initialize GLEW
-    glewExperimental = GL_TRUE;
-    glewInit();
+    // glewExperimental = GL_TRUE;
+    // glewInit();
 
     // Enable depth test
     glEnable(GL_DEPTH_TEST);

@@ -1,7 +1,8 @@
 CC = g++
 CFLAGS = -g -DGL_GLEXT_PROTOTYPES
-LIBS = -Ieigen-3.2.4 -Iglm-0.9.6.3
-LDFLAGS = -lglut -lGLU -lGL -lGLEW
+LIBS = -Ieigen-3.2.4 -Iglm-0.9.6.3 -Iglew-1.12.0
+
+LDFLAGS = -lglut -lGLU -lGL -L/home/cc/cs184/sp15/class/cs184-cw/Assignments/as4/glew-1.12.0/lib -lGLEW
 
 FILES = shader.cpp joint.cpp readfile.cpp keylistener.cpp
 
