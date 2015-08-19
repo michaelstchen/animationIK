@@ -1,3 +1,13 @@
+//***************************************************
+// Author: Taken from tutorial at www.opengl-tutorial.org
+//
+// Description:
+//    Performs all the knitty-gritty compilation and linking
+//    of the GLSL vertex and fragment shaders.
+//
+//****************************************************
+
+
 #include <stdio.h>
 #include <string>
 #include <vector>

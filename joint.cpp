@@ -1,3 +1,14 @@
+//***************************************************
+// Author: Michael Stephen Chen
+//
+// Description:
+//    Definition for our joint class. Functions that perform
+//    all the mathematical computation for the inverse kinematics
+//    (determines position of obj in next frame given a path).
+//
+//****************************************************
+
+
 #include <iostream>
 #include <stdio.h>
 #include <cmath>
@@ -232,33 +243,3 @@ mat4 Joint::modelMat() {
     return toWorld * eigen_to_glm(R());
 
 }
-
-
-// int main(int argc, char **argv) {
-//     Joint* joint0; Joint* joint1;
-//     Joint* joint2; Joint* joint3;
-    
-//     joint0 = new Joint(NULL, joint1, 1.0f);
-//     joint1 = new Joint(joint0, joint2, 2.0f);
-//     joint2 = new Joint(joint1, joint3, 3.0f);
-//     joint3 = new Joint(joint2, NULL, 4.0f);
-    
-//     joint0->next = joint1;
-//     joint1->next = joint2;
-//     joint2->next = joint3;
-
-//     vector<Joint*> skel;
-//     skel.push_back(joint0);
-//     skel.push_back(joint1);
-//     skel.push_back(joint2);
-//     skel.push_back(joint3);
-
-//     // Vector4f goal;
-//     // goal << 7.0f, 0.0f, 5.0f, 1.0f;
-
-//     // for (int i = 0; i < 4; i++) {
-//     //     IKsolver(skel, goal, 0.01f);
-        
-//     // }
-    
-// }

@@ -1,3 +1,12 @@
+//***************************************************
+// Author: Michael Stephen Chen
+//
+// Description:
+//    Parses input .obj file (detailing vertices).
+//
+//****************************************************
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>

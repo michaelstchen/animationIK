@@ -1,3 +1,13 @@
+//***************************************************
+// Author: Michael Stephen Chen
+//
+// Description:
+//    A simple animation of a set of joints (pyramids)
+//    that trace out a path using inverse kinematics.
+//    Main file does all of the OpenGL rendering.
+//
+//****************************************************
+
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
@@ -90,6 +100,8 @@ void renderScene() {
     Vector4f goal_eigen;
     goal_eigen << goal_glm[0], goal_glm[1], goal_glm[2], 1.0f;
 
+    // Determine positions of the joints for the current frame
+    // using inverse kinematics.
     if (IKsolver(skeleton, goal_eigen, 0.03f) == 0) {
         if (currgoalInd >= goal_verts.size() - 1) {
             currgoalInd = 0;

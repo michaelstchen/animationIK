@@ -1,3 +1,14 @@
+//***************************************************
+// Author: Michael Stephen Chen
+//
+// Description:
+//    our windows callback functions detailing how to respond
+//    to user inputs for translation, rotation, and zoom, etc. for
+//    the object displayed by our scene.
+//
+//****************************************************
+
+
 #include <stdlib.h>
 #include <stdio.h>
 
