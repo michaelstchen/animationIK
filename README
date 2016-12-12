@@ -3,19 +3,6 @@ Username: cs184-cw
 
 Platform: Linux
 
-Location: /home/cc/cs184/sp15/class/cs184-cw/Assignments/as4
-
-
-Compiles on the machines in 349 Soda with "make" BUT RUNS INTO THE FOLLOWING
-ERROR WHEN TRYING TO RUN EXECUTABLE "./as4":
-
-      error while loading shared libraries: libGLEW.so.1.12: cannot open shared 
-      object file: No such file or directory
-
-As you can probabaly tell, I tried to build a separate shared GLEW library 
-(the folder glew-1.12.0/) but I kept getting linker errors...If GLEW is
-installed properly there should be no error.
-
 
 The following libraries were used:
       - glm and Eigen were used for vector and matrix math
@@ -23,9 +10,8 @@ The following libraries were used:
         OpenGL viewing window.
 
 
-After compilation, to run the animation use:
+After compilation ("make" on terminal), to run the animation use:
       ./as4
-
 
 All of the code for initializing a window and for applying a shader borrowed
 heavily from the OpenGL/GLSL tutorials at the following sites:
@@ -42,6 +28,3 @@ All required features are implemented:
     -robust to out-of-reach goals
 see video on webpage or in the folder /home/cc/cs184/sp15/class/cs184-cw/Assignments/as4/Videos
 for a video of the animation.
-
-NOTE:
-        Check out the Video/ folder to see what this application does.
